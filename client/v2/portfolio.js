@@ -24,6 +24,8 @@ let currentPagination = {};
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
+const selectBrand = document.querySelector('#brand-select');
+const selectSort = document.querySelector('#sort-select');;
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
 
@@ -43,41 +45,55 @@ const setCurrentProducts = ({result, meta}) => {
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
  */
-const fetchProducts = async (page = 1, size = 12) => {
-  try {
-    const response = await fetch(
-      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
-    );
-    const body = await response.json();
 
+
+
+const fetchProducts = async (page = 1, size = 12, productBrand = "all") => {
+  try {
+    let url = `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`;
+    if (productBrand !== "all") {
+      url += `&brand=${productBrand}`;
+    }
+
+    const response = await fetch(url);
+    const body = await response.json();
     if (body.success !== true) {
       console.error(body);
-      return {currentProducts, currentPagination};
+      return { currentProducts, currentPagination };
     }
 
     return body.data;
   } catch (error) {
     console.error(error);
-    return {currentProducts, currentPagination};
+    return { currentProducts, currentPagination };
   }
+};
+
+const fetchAllProducts = async() =>{
+  fetchProducts(1,999999)
 };
 
 /**
  * Render list of products
  * @param  {Array} products
  */
+
+// Initialize an empty array for holding the favorite product IDs
+let favoriteProductsID = [];
+
 const renderProducts = products => {
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
-  const template = products
-    .map(product => {
+  const template = products.map(product => {
       return `
-      <div class="product" id=${product.uuid}>
-        <span>${product.brand}</span>
-        <a href="${product.link}">${product.name}</a>
-        <span>${product.price}</span>
-      </div>
-    `;
+        <div class="product" id="${product.uuid}">
+          <span>${product.brand}</span>
+          <a href="${product.link}">${product.name}</a>
+          <span>${product.price}</span>
+          <span>${product.released}</span>
+          <button class="like-button" data-uuid="${product.uuid}">Add to Favorites</button>
+        </div>
+      `;
     })
     .join('');
 
@@ -85,7 +101,64 @@ const renderProducts = products => {
   fragment.appendChild(div);
   sectionProducts.innerHTML = '<h2>Products</h2>';
   sectionProducts.appendChild(fragment);
+
 };
+
+// Function to add the current product's uuid to favoriteProductsID list
+const addToFavorites = e => {
+  const uuid = e.target.dataset.uuid;
+  
+  // check if product's id already exists in favoriteProductsID array
+  if(favoriteProductsID.includes(uuid)){
+    // remove product's id from favoriteProductsID array
+    const indexToRemove = favoriteProductsID.indexOf(uuid);
+    favoriteProductsID.splice(indexToRemove, 1);
+
+    // update the style of the button to show it is not in favorites list
+    e.target.classList.add('unliked');
+    e.target.textContent = 'Add to Favorites';
+  } else {
+    // Add the uuid value to favoriteProductsID array
+    favoriteProductsID.push(uuid); 
+
+    // update the style of the button to show it is added to favorites list
+    e.target.classList.remove('unliked'); 
+    e.target.textContent = 'Added to Favorites';
+  }
+  console.log(favoriteProductsID); 
+  renderFavorites();  
+};
+
+const renderFavorites = () => {
+  const favoriteProducts = products.filter(product => favoriteProductsID.includes(product.uuid));
+  const favoriteFragment = document.createDocumentFragment();
+  const favoriteDiv = document.createElement('div');
+  const favoriteTemplate = favoriteProducts
+    .map(favoriteProduct => {
+      return `
+        <div class="product" id="${favoriteProduct.uuid}">
+          <span>${favoriteProduct.brand}</span>
+          <a href="${favoriteProduct.link}">${favoriteProduct.name}</a>
+          <span>${favoriteProduct.price}</span>
+          <span>${favoriteProduct.released}</span>
+        </div>
+      `;
+    })
+    .join('');
+
+  favoriteDiv.innerHTML = favoriteTemplate;
+  favoriteFragment.appendChild(favoriteDiv);
+  sectionFavorites.innerHTML = '<h2>Favorite Products</h2>';
+  sectionFavorites.appendChild(favoriteFragment);
+}
+
+// Adding event listeners to the like button (outside the renderProducts function)
+document.addEventListener('click', event => {
+  if (event.target.classList.contains('like-button')) {
+    addToFavorites(event);
+  }
+});
+
 
 /**
  * Render page selector
@@ -97,10 +170,10 @@ const renderPagination = pagination => {
     {'length': pageCount},
     (value, index) => `<option value="${index + 1}">${index + 1}</option>`
   ).join('');
-
   selectPage.innerHTML = options;
   selectPage.selectedIndex = currentPage - 1;
 };
+
 
 /**
  * Render page selector
@@ -132,9 +205,69 @@ selectShow.addEventListener('change', async (event) => {
   render(currentProducts, currentPagination);
 });
 
+selectPage.addEventListener('change', async (event) => {
+  const products = await fetchProducts(parseInt(event.target.value), parseInt(selectShow.value)); 
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+selectBrand.addEventListener('change', async (event) => {
+  const products = await fetchProducts(parseInt(selectPage.value), parseInt(selectShow.value), event.target.value);
+  console.log(products);
+  const res = products.result;
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+
+});
+
+/*
+selectBrand.addEventListener('change', async (event) => {
+  const products = await fetchProducts(1, 99999);
+  console.log(products);
+  const res = products.result;
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+*/
+selectSort.addEventListener('change', async (event) => {
+  const products = await fetchProducts(parseInt(selectPage.value), parseInt(selectShow.value), selectBrand.value);
+  const res = products.result;
+
+  if(event.target.value=="price-asc"){
+    res.sort((a, b) => a.price - b.price);
+  }
+  if(event.target.value=="price-desc"){
+    res.sort((a, b) => b.price - a.price);
+  }
+  if (event.target.value === "date-desc") {
+    res.sort((a, b) => new Date(b.released) - new Date(a.released));
+  }
+  if (event.target.value === "date-asc") {
+    res.sort((a, b) => new Date(a.released) - new Date(b.released));
+  }
+  
+  for (const product of res) {
+    console.log(product.price);
+  }
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
   const products = await fetchProducts();
 
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
+
+
+
+const currentBrands = [];
+currentProducts.forEach(product => {
+  const brandExists = currentBrands.some(brand => brand === product.brand);
+  if (!brandExists) {
+    currentBrands.push(product.brand);
+  }
+});
+
+console.log(currentBrands.length); // This will log the number of brands

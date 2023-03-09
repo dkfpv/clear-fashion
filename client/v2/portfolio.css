@@ -1,0 +1,91 @@
+/* Center the page content */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+/* Style the page title */
+h1 {
+  text-align: center;
+  color: #0066cc;
+}
+
+/* Style the sections */
+section {
+  margin: 20px 0;
+  width: 70%;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border-radius: 10px;
+}
+
+/* Style the options section */
+#options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Style the filters section */
+#filters {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Style the products table */
+#products table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  margin-top: 20px;
+}
+
+#products th {
+  background-color: #0066cc;
+  color: white;
+  padding: 10px;
+}
+
+#products td {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+
+#indicators {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  #indicators > div {
+    padding: 10px;
+  }
+  
+  #indicators h2 {
+    grid-column: 1 / span 2;
+  }
+  
+  #indicators span:first-of-type {
+    font-weight: bold;
+  }
+  
+  #indicators #nbProducts {
+    color: green;
+  }
+  
+  #indicators #nbBrands {
+    color: blue;
+  }
+  .product {
+    display: flex;
+  }
+  
+  .like-button {
+    margin-left: auto;
+  }
+  
+/* 
+
