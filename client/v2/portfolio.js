@@ -84,25 +84,25 @@ let favoriteProductsID = [];
 const renderProducts = products => {
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
+  
   const template = products.map(product => {
-      return `
-        <div class="product" id="${product.uuid}">
-          <span>${product.brand}</span>
-          <a href="${product.link}">${product.name}</a>
-          <span>${product.price}</span>
-          <span>${product.released}</span>
-          <button class="like-button" data-uuid="${product.uuid}">Add to Favorites</button>
-        </div>
-      `;
-    })
-    .join('');
+    return `
+      <div class="product" id="${product.uuid}">
+        <span>${product.brand}</span>
+        <a href="${product.link}">${product.name}</a>
+        <span>${product.price}€</span>
+        <td>Release date: ${product.released}</td>
+        <button class="like-button" data-uuid="${product.uuid}">Add to Favorites</button>
+      </div>
+    `;
+  }).join('');
 
   div.innerHTML = template;
   fragment.appendChild(div);
   sectionProducts.innerHTML = '<h2>Products</h2>';
   sectionProducts.appendChild(fragment);
-
 };
+
 
 // Function to add the current product's uuid to favoriteProductsID list
 const addToFavorites = e => {
