@@ -1,21 +1,11 @@
-/* eslint-disable no-console, no-process-exit */
-const dedicatedbrand = require('./eshops/dedicatedbrand');
+const dedicated_products = require('./eshops/dedicatedbrand');
+const montlimart_products = require('./eshops/montlimartbrand');
+const cs_products = require('./eshops/circle_sportswear');
 
-async function sandbox (eshop = 'https://www.dedicatedbrand.com/en/men/news') {
-  try {
-    console.log(`🕵️‍♀️  browsing ${eshop} eshop`);
+//console.log(dedicated_products);
+//console.log(montlimart_products);
+console.log(cs_products);
+all_products = dedicated_products + montlimart_products + cs_products;
 
-    const products = await dedicatedbrand.scrape(eshop);
-
-    console.log(products);
-    console.log('done');
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
-}
-
-const [,, eshop] = process.argv;
-
-sandbox(eshop);
+//console.log(all_products);
+//console.log(all_products);

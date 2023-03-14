@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My App</title>
+</head>
+<body>
+  <h1>Products</h1>
+  <div id="product-list"></div>
+
+  <script>
+    async function loadProducts() {
+      const url = 'https://my-esop.com/products';
+      const response = await fetch(url);
+      const products = await response.json();
+
+      const productList = document.querySelector('#product-list');
+      products.forEach((product) => {
+        const item = document.createElement('div');
+        item.innerHTML = `
+          <h2>${product.name}</h2>
+          <p>Price: ${product.price}</p>
+        `;
+        productList.appendChild(item);
+      });
+    }
+    loadProducts();
+  </script>
+</body>
+</html>
