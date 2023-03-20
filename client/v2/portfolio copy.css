@@ -89,31 +89,5 @@ section {
   margin-left: auto;
 }
 
-/* Style the select elements */
-select {
-  background-color: #ac1b1b;
-  color: #333;
-  border: none;
-  padding: 8px;
-  font-size: 14px;
-  appearance: none;
-  -webkit-appearance:none;
-  -moz-appearance: none;
-}
-
-/* Style the options dropdown arrow */
-select::before {
-  content: '\25BC';
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  color: #555;
-}
-
-/* Hover effect for select elements */
-select:hover {
-  background-color: #ddd;
-}
 
 
